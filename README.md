@@ -35,6 +35,27 @@ Example: from `input.mp3`
 
 
 # Building
+## Windows
+### Build Playdate Simulator + Visual Studio
+`mkdir build`
+`cd build`
+`cmake ..`
+You need to install clang: https://learn.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-170
+In visual studio:
+- In the Solutions Explorer within Visual Studio, select the target with the project name, not a meta target.
+- Right-click and select "Set as Startup Project"
+- Solution Explorer->wipeout->(right click)->properties->General->Platform Toolset-> LLVM (clang-cl)
+
+
+### Build Playdate Device:
+`cmake .. -G "MinGW Makefiles" --toolchain=C:/develop/PlaydateSDK/C_API/buildsupport/arm.cmake`
+then
+`cmake --build .`
+or optionally:
+`cmake --build . --config Release`
+or
+`cmake --build . --config Debug`
+
 
 ## Nova
 Use the integrated Playdate Simulator Tasks for building and running
