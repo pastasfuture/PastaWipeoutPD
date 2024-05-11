@@ -254,19 +254,36 @@ void track_draw(camera_t *camera, PlaydateAPI *pd) {
 	vec3_t cam_pos = camera->position;
 	vec3_t cam_dir = camera_forward(camera);
 	
+	
 	int drawn = 0;
 	int skipped = 0;
-	for(int32_t i = 0; i < g.track.section_count; i++) {
-		section_t *s = &g.track.sections[i];
-		vec3_t diff = vec3_sub(cam_pos, s->center);
-		float cam_dot = vec3_dot(diff, cam_dir);
-		float dist_sq = vec3_dot(diff, diff);
-		if (
-			cam_dot < s->radius && // FIXME: should use the bounding radius of the section
-			dist_sq < (RENDER_FADEOUT_FAR * RENDER_FADEOUT_FAR)
-		) {
-			// printf("**TS** track draw section %d cam_dot %f radius %f\n", i, cam_dot, s->radius);
-			track_draw_section(s, pd);
+	if (camera->section != NULL)
+	{
+		int sections_drawn_count = 0;
+		if (camera->section->prev != NULL)
+		{
+			track_draw_section(camera->section->prev, pd);
+			++sections_drawn_count;
+		}
+		for (section_t* section_current = camera->section; section_current != NULL && sections_drawn_count < 9; section_current = section_current->next, ++sections_drawn_count)
+		{
+			track_draw_section(section_current, pd);
+		}
+	}
+	else
+	{
+		for (int32_t i = 0; i < g.track.section_count; i++) {
+			section_t* s = &g.track.sections[i];
+			vec3_t diff = vec3_sub(cam_pos, s->center);
+			float cam_dot = vec3_dot(diff, cam_dir);
+			float dist_sq = vec3_dot(diff, diff);
+			if (
+				cam_dot < s->radius && // FIXME: should use the bounding radius of the section
+				dist_sq < (RENDER_FADEOUT_FAR * RENDER_FADEOUT_FAR)
+				) {
+				// printf("**TS** track draw section %d cam_dot %f radius %f\n", i, cam_dot, s->radius);
+				track_draw_section(s, pd);
+			}
 		}
 	}
 }

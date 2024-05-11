@@ -13,6 +13,9 @@
 #include "object.h"
 #include "game.h"
 
+#ifndef M_PI
+#define M_PI (3.14159f)
+#endif
 
 #define SCENE_START_BOOMS_MAX 4
 #define SCENE_OIL_PUMPS_MAX 2

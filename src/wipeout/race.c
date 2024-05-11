@@ -18,6 +18,8 @@
 #include "ship_ai.h"
 // #include "ingame_menus.h"
 
+#include "input.h"
+
 #define ATTRACT_DURATION 60.0
 
 static bool is_paused = false;
@@ -64,6 +66,10 @@ void race_init(PlaydateAPI* pd) {
 }
 
 void race_update(PlaydateAPI *pd, bool draw_scenery) {
+	
+	input_update(pd);
+
+
 	// if (is_paused) {
 	// 	if (!active_menu) {
 	// 		active_menu = pause_menu_init();

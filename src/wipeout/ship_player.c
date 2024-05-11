@@ -19,11 +19,7 @@
 #include "game.h"
 #include "particle.h"
 
-#define INPUT_ACTION_MAX 32
-static float actions_state[INPUT_ACTION_MAX];
-static bool actions_pressed[INPUT_ACTION_MAX];
-float input_state(uint8_t action);
-bool input_pressed(uint8_t action);
+#include "input.h"
 
 void ship_player_update_sfx(ship_t *self) {
 	float speedf = self->speed * 0.000015F;
@@ -577,12 +573,4 @@ ship_t *ship_player_find_target(ship_t *self) {
 	else {
 		return NULL;
 	}
-}
-
-float input_state(uint8_t action) {
-	return actions_state[action];
-}
-
-bool input_pressed(uint8_t action) {
-	return actions_pressed[action];
 }

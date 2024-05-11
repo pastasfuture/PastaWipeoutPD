@@ -27,15 +27,17 @@ void ships_load(PlaydateAPI *pd) {
 
 	int object_index;
 	Object *ship_model = ship_models;
-	Object *collision_model = collision_models;
+	//Object *collision_model = collision_models;
 
-	for (object_index = 0; object_index < len(g.ships) && ship_model && collision_model; object_index++) {
+	for (object_index = 0; object_index < len(g.ships) && ship_model
+		//&& collision_model
+		; object_index++) {
 		int ship_index = def.ship_model_to_pilot[object_index];
 		g.ships[ship_index].model = ship_model;
-		g.ships[ship_index].collision_model = collision_model;
+		g.ships[ship_index].collision_model = NULL;// collision_model;
 
 		ship_model = ship_model->next;
-		collision_model = collision_model->next;
+		//collision_model = collision_model->next;
 
 		ship_init_exhaust_plume(&g.ships[ship_index]);
 	}
@@ -401,7 +403,10 @@ void ship_reset_exhaust_plume(ship_t* self)
 
 void ship_draw(ship_t *self, PlaydateAPI *pd) {
 	// printf(" ship draw: vertices %d primitives %d\n", self->model->vertices_len, self->model->primitives_len);
-	object_draw(self->model, &self->mat, pd);
+	if (self->model != NULL)
+	{
+		object_draw(self->model, &self->mat, pd);
+	}
 }
 
 void ship_draw_shadow(ship_t *self, PlaydateAPI *pd) {	

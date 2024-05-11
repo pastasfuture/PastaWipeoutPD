@@ -31,9 +31,9 @@ set(PLAYDATE_GAME_DEVICE wipeout_DEVICE)
 project(${PLAYDATE_GAME_NAME} C ASM)
 
 if (TOOLCHAIN STREQUAL "armgcc")
-	add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c src/main.c src/utils.c src/mem.c src/types.c src/platform.c src/render.c src/system.c src/wipeout/game.c src/wipeout/camera.c src/wipeout/droid.c src/wipeout/object.c src/wipeout/particle.c src/wipeout/race.c src/wipeout/scene.c src/wipeout/sfx.c src/wipeout/ship_ai.c src/wipeout/ship_player.c src/wipeout/ship.c src/wipeout/track.c src/wipeout/weapon.c)
+	add_executable(${PLAYDATE_GAME_DEVICE} ${SDK}/C_API/buildsupport/setup.c src/main.c src/utils.c src/mem.c src/types.c src/platform.c src/render.c src/system.c src/wipeout/game.c src/wipeout/camera.c src/wipeout/droid.c src/wipeout/object.c src/wipeout/particle.c src/wipeout/race.c src/wipeout/scene.c src/wipeout/sfx.c src/wipeout/ship_ai.c src/wipeout/ship_player.c src/wipeout/ship.c src/wipeout/track.c src/wipeout/weapon.c src/wipeout/input.c)
 else()
-	add_library(${PLAYDATE_GAME_NAME} SHARED src/main.c src/utils.c src/mem.c src/types.c src/platform.c src/render.c src/system.c src/wipeout/game.c src/wipeout/camera.c src/wipeout/droid.c src/wipeout/object.c src/wipeout/particle.c src/wipeout/race.c src/wipeout/scene.c src/wipeout/sfx.c src/wipeout/ship_ai.c src/wipeout/ship_player.c src/wipeout/ship.c src/wipeout/track.c src/wipeout/weapon.c)
+	add_library(${PLAYDATE_GAME_NAME} SHARED src/main.c src/utils.c src/mem.c src/types.c src/platform.c src/render.c src/system.c src/wipeout/game.c src/wipeout/camera.c src/wipeout/droid.c src/wipeout/object.c src/wipeout/particle.c src/wipeout/race.c src/wipeout/scene.c src/wipeout/sfx.c src/wipeout/ship_ai.c src/wipeout/ship_player.c src/wipeout/ship.c src/wipeout/track.c src/wipeout/weapon.c src/wipeout/input.c)
 endif()
 
 include(${SDK}/C_API/buildsupport/playdate_game.cmake)

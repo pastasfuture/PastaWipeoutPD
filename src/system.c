@@ -6,6 +6,10 @@
 
 #include "wipeout/game.h"
 
+#ifndef M_PI
+#define M_PI (3.14159f)
+#endif
+
 static float time_real;
 static float time_scaled;
 static float time_scale = 1.0;
