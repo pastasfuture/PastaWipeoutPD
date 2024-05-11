@@ -1,5 +1,6 @@
 Source/wipeout
 build
+build_device
 wipeout.pdx
 Source/pdex.dylib
 Source/pdex.elf
