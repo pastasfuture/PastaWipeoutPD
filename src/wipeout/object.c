@@ -425,7 +425,7 @@ void object_draw(Object *object, mat4_t *mat, PlaydateAPI *pd) {
 			coord1 = poly.gt4->coords[1];
 			coord2 = poly.gt4->coords[2];
 			coord3 = poly.gt4->coords[3];
-			render_push_tris_pair((tris_pair_t) {
+			render_push_quad((quad_t) {
 				.vertices = {
 					vertex[coord0],
 					vertex[coord1],
@@ -458,7 +458,7 @@ void object_draw(Object *object, mat4_t *mat, PlaydateAPI *pd) {
 			coord1 = poly.ft4->coords[1];
 			coord2 = poly.ft4->coords[2];
 			coord3 = poly.ft4->coords[3];
-			render_push_tris_pair((tris_pair_t) {
+			render_push_quad((quad_t) {
 				.vertices = {
 					vertex[coord0],
 					vertex[coord1],
@@ -491,7 +491,7 @@ void object_draw(Object *object, mat4_t *mat, PlaydateAPI *pd) {
 			coord1 = poly.g4->coords[1];
 			coord2 = poly.g4->coords[2];
 			coord3 = poly.g4->coords[3];
-			render_push_tris_pair((tris_pair_t) {
+			render_push_quad((quad_t) {
 				.vertices = {
 					vertex[coord0],
 					vertex[coord1],
@@ -524,7 +524,7 @@ void object_draw(Object *object, mat4_t *mat, PlaydateAPI *pd) {
 			coord1 = poly.f4->coords[1];
 			coord2 = poly.f4->coords[2];
 			coord3 = poly.f4->coords[3];
-			render_push_tris_pair((tris_pair_t) {
+			render_push_quad((quad_t) {
 				.vertices = {
 					vertex[coord0],
 					vertex[coord1],

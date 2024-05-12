@@ -90,17 +90,17 @@ void render_set_screen_size(PlaydateAPI *pd) {
 
 void render_frame_prepare(PlaydateAPI *pd) {
 	// TODO: why can't we use `pd->graphics->clear(kColorWhite)` - it fails to build - ?
-	pd->graphics->fillRect(0, 0, screen_size.x, screen_size.y, kColorBlack); // clear screen 
+	pd->graphics->fillRect(0, 0, screen_size.x, screen_size.y, kColorBlack); // clear screen
 	// uint8_t *display = pd->graphics->getFrame();
 	// memset(display, kColorBlack, 240 * 52);
 }
 
 void setPixel(int x, int y, uint8_t *display) {
-	
+
 	if(x < 0 || x > 399 || y < 0 || y > 239) {
 		return;
 	}
-	
+
 	display[(y)*52+(x)/8] |= (1 << (uint8_t)(7 - ((x) % 8)));
 }
 
@@ -176,7 +176,7 @@ void render_push_tris(tris_t tris, PlaydateAPI *pd) {
 	vec2i_t sc2 = vec2i(p2.x * screen_w2 + screen_w2, screen_h2 - p2.y * screen_h2);
 	
 	float avg_z = (p0.z + p1.z + p2.z) * 0.33333F;
-	
+
 	// wireframe
 	// LCDColor draw_color;
 	// if (avg_z < 0.993F) {
@@ -186,7 +186,7 @@ void render_push_tris(tris_t tris, PlaydateAPI *pd) {
 	// } else {
 	// 	draw_color = (LCDColor)grey25;
 	// }
-	
+
 	uint8_t *display = pd->graphics->getFrame();
 	line_bresenham(sc0.x, sc0.y, sc1.x, sc1.y, display);
 	line_bresenham(sc1.x, sc1.y, sc2.x, sc2.y, display);
@@ -196,12 +196,11 @@ void render_push_tris(tris_t tris, PlaydateAPI *pd) {
 	// pd->graphics->drawLine(sc2.x, sc2.y, sc0.x, sc0.y, 1, draw_color);
 }
 
-void render_push_tris_pair(tris_pair_t tris_pair, PlaydateAPI *pd) {
-
-	vec3_t p0 = vec3_transform(tris_pair.vertices[0], &mvp_mat);
-	vec3_t p1 = vec3_transform(tris_pair.vertices[1], &mvp_mat);
-	vec3_t p2 = vec3_transform(tris_pair.vertices[2], &mvp_mat);
-	vec3_t p3 = vec3_transform(tris_pair.vertices[3], &mvp_mat);
+void render_push_quad(quad_t quad, PlaydateAPI *pd) {
+	vec3_t p0 = vec3_transform(quad.vertices[0], &mvp_mat);
+	vec3_t p1 = vec3_transform(quad.vertices[1], &mvp_mat);
+	vec3_t p2 = vec3_transform(quad.vertices[2], &mvp_mat);
+	vec3_t p3 = vec3_transform(quad.vertices[3], &mvp_mat);
 	if (p0.z >= 1.0F || p1.z >= 1.0F || p2.z >= 1.0F || p3.z >= 1.0F) {
 		return;
 	}
@@ -212,7 +211,7 @@ void render_push_tris_pair(tris_pair_t tris_pair, PlaydateAPI *pd) {
 	vec2i_t sc3 = vec2i(p3.x * screen_w2 + screen_w2, screen_h2 - p3.y * screen_h2);
 	
 	float avg_z = (p0.z + p1.z + p2.z + p3.z) * 0.25F;
-	
+
 	// wireframe
 	// LCDColor draw_color;
 	// if (avg_z < 0.993F) {
@@ -227,7 +226,7 @@ void render_push_tris_pair(tris_pair_t tris_pair, PlaydateAPI *pd) {
 	line_bresenham(sc2.x, sc2.y, sc0.x, sc0.y, display);
 	line_bresenham(sc2.x, sc2.y, sc3.x, sc3.y, display);
 	line_bresenham(sc3.x, sc3.y, sc1.x, sc1.y, display);
-	
+
 	// pd->graphics->drawLine(sc0.x, sc0.y, sc1.x, sc1.y, 1, draw_color);
 	// pd->graphics->drawLine(sc2.x, sc2.y, sc0.x, sc0.y, 1, draw_color);
 	// pd->graphics->drawLine(sc2.x, sc2.y, sc3.x, sc3.y, 1, draw_color);
