@@ -22,6 +22,7 @@
 #define SCENE_RED_LIGHTS_MAX 4
 #define SCENE_STANDS_MAX 20
 
+static section_t** scene_objects_sections;
 static Object *scene_objects;
 static Object *sky_object;
 static vec3_t sky_offset;
@@ -68,6 +69,7 @@ void scene_load(const char *base_path, float sky_y_offset, PlaydateAPI* pd) {
 	stands_len = 0;
 
 	Object *obj = scene_objects;
+	int object_count = 0;
 	while (obj) {
 		mat4_set_translation(&obj->mat, obj->origin);
 
@@ -88,6 +90,52 @@ void scene_load(const char *base_path, float sky_y_offset, PlaydateAPI* pd) {
 			stands[stands_len++] = (scene_stand_t){.sfx = NULL, .pos = obj->origin};
 		}
 		obj = obj->next;
+		++object_count;
+	}
+
+	// Pre-compute the closest section to each object, so that we can do section based culling to speed up object rendering.
+	{
+		scene_objects_sections = mem_bump(object_count * sizeof(section_t*));
+		int scene_object_index = 0;
+		Object* obj = scene_objects;
+		while (obj) {
+			vec3_t position_ws = obj->origin;
+			//float radius = obj->radius;
+			float distance_min = 3.402823466e+38F;
+			section_t* section_nearest = NULL;
+
+			section_t* s = g.track.sections;
+			section_t* j = NULL;
+			do {
+				if (s->junction) { // start junction
+					j = s->junction;
+
+					float distance_current = vec3_len(vec3_sub(position_ws, j->center));
+					if ((section_nearest == NULL) || distance_min > distance_current)
+					{
+						distance_min = distance_current;
+						section_nearest = s;
+					}
+
+					do {
+						j = j->next;
+					} while (!j->junction); // end junction	
+				}
+
+				float distance_current = vec3_len(vec3_sub(position_ws, s->center));
+				if ((section_nearest == NULL) || distance_min > distance_current)
+				{
+					distance_min = distance_current;
+					section_nearest = s;
+				}
+
+				s = s->next;
+			} while (s != g.track.sections);
+
+			scene_objects_sections[scene_object_index++] = section_nearest;
+			obj = obj->next;
+		}
+		
 	}
 
 	aurora_borealis.enabled = false;
@@ -131,17 +179,42 @@ void scene_draw(camera_t *camera, PlaydateAPI *pd) {
 	vec3_t cam_dir = camera_forward(camera);
 	Object *object = scene_objects;
 	
+	int scene_object_index = 0;
+	bool log = true;
 	while (object) {
-		vec3_t diff = vec3_sub(cam_pos, object->origin);
-		float cam_dot = vec3_dot(diff, cam_dir);
-		float dist_sq = vec3_dot(diff, diff);
-		if (
-			cam_dot < object->radius && 
-			dist_sq < (RENDER_FADEOUT_FAR * RENDER_FADEOUT_FAR)
-		) {
-			object_draw(object, &object->mat, pd);
+		section_t* scene_object_section = scene_objects_sections[scene_object_index];
+
+		bool object_visible = true;
+		if (scene_object_section != NULL)
+		{
+			object_visible = false;
+			int sections_queried_count = 0;
+			if (camera->section->prev != NULL)
+			{
+				object_visible = camera->section->prev == scene_object_section;
+				++sections_queried_count;
+			}
+			for (section_t* section_current = camera->section; (section_current != NULL) && (sections_queried_count < 9) && (object_visible == false); section_current = section_current->next, ++sections_queried_count)
+			{
+				object_visible |= section_current == scene_object_section;
+			}
 		}
+
+		if (object_visible)
+		{
+			vec3_t diff = vec3_sub(cam_pos, object->origin);
+			float cam_dot = vec3_dot(diff, cam_dir);
+			float dist_sq = vec3_dot(diff, diff);
+			if (
+				cam_dot < object->radius
+				//&& dist_sq < (RENDER_FADEOUT_FAR * RENDER_FADEOUT_FAR)
+				) {
+				object_draw(object, &object->mat, pd);
+			}
+		}
+
 		object = object->next;
+		++scene_object_index;
 	}
 }
 
