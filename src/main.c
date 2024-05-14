@@ -12,7 +12,8 @@
 #include "pd_api.h"
 #include "system.h"
 
-#define TARGET_FPS 30.0
+//#define TARGET_FPS 30.0
+#define TARGET_FPS 50.0
 
 static bool draw_scenery = true;
 

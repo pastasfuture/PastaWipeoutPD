@@ -23,21 +23,21 @@ void ships_load(PlaydateAPI *pd) {
 	Object *ship_models = objects_load("wipeout/common/allsh.prm", ship_textures, pd);
 
 	texture_list_t collision_textures = texture_list_empty(); // image_get_compressed_textures("wipeout/common/alcol.cmp");
-	Object *collision_models = objects_load("wipeout/common/alcol.prm", collision_textures, pd);
+	Object *collision_models = objects_load("wipeout/common/allcol.prm", collision_textures, pd); // note: demo asset name is allcol, but source was originally looking for "alcol"
 
 	int object_index;
 	Object *ship_model = ship_models;
-	//Object *collision_model = collision_models;
+	Object *collision_model = collision_models;
 
 	for (object_index = 0; object_index < len(g.ships) && ship_model
-		//&& collision_model
+		&& collision_model
 		; object_index++) {
 		int ship_index = def.ship_model_to_pilot[object_index];
 		g.ships[ship_index].model = ship_model;
-		g.ships[ship_index].collision_model = NULL;// collision_model;
+		g.ships[ship_index].collision_model = collision_model;
 
 		ship_model = ship_model->next;
-		//collision_model = collision_model->next;
+		collision_model = collision_model->next;
 
 		ship_init_exhaust_plume(&g.ships[ship_index]);
 	}
@@ -148,8 +148,45 @@ void ships_draw(PlaydateAPI *pd) {
 	
 	render_set_depth_write(false);
 	render_set_depth_offset(-32.0);
+
+	bool ship_is_visible[NUM_PILOTS];
+
+	if (g.camera.section != NULL)
+	{
+		for (int i = 0; i < len(g.ships); ++i)
+		{
+			ship_is_visible[i] = !((g.race_type == RACE_TYPE_TIME_TRIAL) && (i != g.pilot));
+			if (ship_is_visible[i])
+			{
+				bool ship_is_on_visible_section = false;
+
+				int sections_tested_count = 0;
+				if (g.camera.section->prev != NULL)
+				{
+					if (g.ships[i].section == g.camera.section->prev)
+					{
+						ship_is_on_visible_section = true;
+					}
+					++sections_tested_count;
+				}
+				for (section_t* section_current = g.camera.section; !ship_is_on_visible_section && (section_current != NULL) && (sections_tested_count < 9); section_current = section_current->next, ++sections_tested_count)
+				{
+					if (g.ships[i].section == section_current)
+					{
+						ship_is_on_visible_section = true;
+					}
+				}
+
+				ship_is_visible[i] = ship_is_on_visible_section;
+			}
+		}
+	}
 	
 	for (int i = 0; i < len(g.ships); i++) {
+		if (!ship_is_visible[i])
+		{
+			continue;
+		}
 		if (
 			(g.race_type == RACE_TYPE_TIME_TRIAL && i != g.pilot) ||
 			flags_not(g.ships[i].flags, SHIP_VISIBLE) || 
@@ -167,6 +204,10 @@ void ships_draw(PlaydateAPI *pd) {
 	
 	// Ship models
 	for (int i = 0; i < len(g.ships); i++) {
+		if (!ship_is_visible[i])
+		{
+			continue;
+		}
 		if (
 			(flags_is(g.ships[i].flags, SHIP_VIEW_INTERNAL) && flags_not(g.ships[i].flags, SHIP_IN_RESCUE)) ||
 			(g.race_type == RACE_TYPE_TIME_TRIAL && i != g.pilot)
